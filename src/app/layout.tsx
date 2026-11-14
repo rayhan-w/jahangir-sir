@@ -32,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="bn" className={`${hindSiliguri.variable} ${inter.variable}`}>
-      <body className="min-h-screen flex flex-col font-sans bg-[#F7F5F0] text-[#1A202C] antialiased">
+      <body className="min-h-screen flex flex-col font-sans bg-white text-[#1F2937] antialiased">
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>

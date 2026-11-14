@@ -3,101 +3,66 @@
 :root {
   --navy: #0B2A5B;
   --blue: #1565D8;
-  --gold: #E9A319;
   --green: #1E8E4F;
-  --ink: #1A202C;
-  --grey: #606C80;
-  --paper: #F7F5F0;
-  --border: #E2DED5;
+  --gold: #E9A319;
+  --body: #1F2937;
+  --secondary: #5B6472;
+  --border: #E5E2DA;
+  --bg-alt: #FAF9F6;
   --white: #FFFFFF;
 }
 
 @theme inline {
   --color-navy: var(--navy);
   --color-blue: var(--blue);
-  --color-gold: var(--gold);
   --color-green: var(--green);
-  --color-ink: var(--ink);
-  --color-grey: var(--grey);
-  --color-paper: var(--paper);
+  --color-gold: var(--gold);
+  --color-body: var(--body);
+  --color-secondary: var(--secondary);
   --color-border: var(--border);
+  --color-bgalt: var(--bg-alt);
   --font-bengali: var(--font-hind-siliguri), sans-serif;
   --font-english: var(--font-inter), sans-serif;
 }
 
-body {
-  background-color: var(--paper);
-  color: var(--ink);
+html {
   font-family: var(--font-hind-siliguri), var(--font-inter), sans-serif;
-  line-height: 1.6;
-}
-
-/* Print-like Editorial Warm Card */
-.efa-card {
   background-color: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  color: #1F2937;
 }
 
-/* Primary Button Solid Navy */
+body {
+  font-family: var(--font-hind-siliguri), var(--font-inter), sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  background-color: #FFFFFF;
+  color: #1F2937;
+}
+
+/* Primary Navy Button (Max 8px radius, no shadow) */
 .btn-navy {
-  background-color: var(--navy);
+  background-color: #0B2A5B;
   color: #FFFFFF;
   font-weight: 600;
-  border-radius: 8px;
-  padding: 10px 20px;
+  border-radius: 6px;
+  padding: 10px 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: opacity 0.15s ease-in-out;
+  text-decoration: none;
+  font-size: 16px;
+  line-height: 1.4;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
 }
 .btn-navy:hover {
-  opacity: 0.92;
+  opacity: 0.9;
 }
 
-/* Accent Button Sun Gold */
-.btn-gold {
-  background-color: var(--gold);
-  color: #0B2A5B;
-  font-weight: 700;
-  border-radius: 8px;
-  padding: 10px 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: opacity 0.15s ease-in-out;
-}
-.btn-gold:hover {
-  opacity: 0.92;
-}
-
-/* Learning Blue Button */
-.btn-blue {
-  background-color: var(--blue);
-  color: #FFFFFF;
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 10px 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: opacity 0.15s ease-in-out;
-}
-.btn-blue:hover {
-  opacity: 0.92;
-}
-
-/* Large Tap Target for Student App (≥56px) */
-.student-tap-target {
-  min-height: 56px;
-  min-width: 56px;
-  border-radius: 12px;
-  font-size: 1.25rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Secondary hairline box or card (max 8px radius, no shadow) */
+.minimal-box {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E2DA;
+  border-radius: 6px;
 }

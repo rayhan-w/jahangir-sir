@@ -2,107 +2,190 @@
 
 import React, { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { DEFAULT_SETTINGS } from "@/lib/data-store";
-import { MapPin, Phone, Mail, Send, CheckCircle2 } from "lucide-react";
+import { siteConfig } from "@/config/site";
 
 export default function ContactPage() {
   const { locale } = useLanguage();
-  const settings = DEFAULT_SETTINGS;
   const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: ""
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
-      <div className="max-w-3xl space-y-4">
-        <div className="inline-block bg-[#1565D8]/10 text-[#1565D8] px-3 py-1 rounded text-sm font-semibold">
-          {locale === "bn" ? "যোগাযোগ" : "Contact Us"}
-        </div>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-12">
+      {/* Header */}
+      <div className="max-w-3xl space-y-3">
+        <span className="text-xs font-semibold text-[#1E8E4F] uppercase tracking-wider block">
+          {locale === "bn" ? "যোগাযোগ ও তথ্য ডেস্ক" : "Contact & Helpdesk"}
+        </span>
         <h1 className="text-3xl sm:text-4xl font-bold text-[#0B2A5B] tracking-tight">
           {locale === "bn" ? "আমাদের সাথে যোগাযোগ করুন" : "Get in Touch with the Research Team"}
         </h1>
-        <p className="text-base text-slate-600">
+        <p className="text-base text-[#5B6472]">
           {locale === "bn"
-            ? "প্রকল্প সংশ্লিষ্ট যেকোনো তথ্য, পরামর্শ বা অংশীদারিত্বের জন্য সরাসরি আমাদের সাথে কথা বলুন।"
+            ? "প্রকল্প সংশ্লিষ্ট যেকোনো তথ্য, পরামর্শ বা অংশীদারিত্বের জন্য সরাসরি আমাদের সাথে যোগাযোগ করতে পারেন।"
             : "Reach out to the BAUST CSE project coordination desk for queries, collaboration, or feedback."}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Contact Info Card */}
-        <div className="lg:col-span-5 efa-card p-6 sm:p-8 bg-white space-y-6">
-          <h2 className="text-xl font-bold text-[#0B2A5B]">
+        {/* Contact Info (Plain Text Labels, Zero Icons) */}
+        <div className="lg:col-span-5 border border-[#E5E2DA] rounded-lg p-6 bg-white space-y-5">
+          <h2 className="text-lg font-bold text-[#0B2A5B] border-b border-[#E5E2DA] pb-3">
             {locale === "bn" ? "অফিস ঠিকানা ও ডেস্ক" : "Office Address & Helpdesk"}
           </h2>
-          <div className="space-y-4 text-sm text-slate-600">
-            <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 text-[#E9A319] shrink-0 mt-0.5" />
-              <div>
-                <strong className="block text-slate-900 mb-0.5">{locale === "bn" ? settings.affiliation.bn : settings.affiliation.en}</strong>
-                <span>{locale === "bn" ? settings.contactAddress.bn : settings.contactAddress.en}</span>
-              </div>
+
+          <div className="space-y-4 text-sm text-[#1F2937]">
+            <div>
+              <span className="text-xs font-bold text-[#5B6472] uppercase block">
+                {locale === "bn" ? "ঠিকানা:" : "Address:"}
+              </span>
+              <p className="font-semibold text-[#0B2A5B] mt-0.5">
+                {locale === "bn" ? siteConfig.affiliation.bn : siteConfig.affiliation.en}
+              </p>
+              <p className="text-[#5B6472] text-xs mt-0.5 leading-relaxed">
+                {locale === "bn" ? siteConfig.contactAddress.bn : siteConfig.contactAddress.en}
+              </p>
             </div>
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-[#1E8E4F] shrink-0" />
-              <a href={`tel:${settings.contactPhone}`} className="hover:text-[#1565D8]">
-                {settings.contactPhone}
+
+            <div>
+              <span className="text-xs font-bold text-[#5B6472] uppercase block">
+                {locale === "bn" ? "হেল্পলাইন ও মোবাইল:" : "Helpline & Phone:"}
+              </span>
+              <a
+                href={`tel:${siteConfig.contactPhone}`}
+                className="font-mono font-bold text-[#0B2A5B] hover:text-[#1565D8] block mt-0.5"
+              >
+                {siteConfig.contactPhone}
+              </a>
+              <span className="text-xs text-[#5B6472]">
+                {locale === "bn" ? "(শনিবার – বৃহস্পতিবার, সকাল ৯টা – বিকাল ৫টা)" : "(Sat – Thu, 9 AM – 5 PM)"}
+              </span>
+            </div>
+
+            <div>
+              <span className="text-xs font-bold text-[#5B6472] uppercase block">
+                {locale === "bn" ? "অফিসিয়াল ইমেইল:" : "Official Email:"}
+              </span>
+              <a
+                href={`mailto:${siteConfig.contactEmail}`}
+                className="font-mono text-[#1565D8] hover:underline block mt-0.5"
+              >
+                {siteConfig.contactEmail}
               </a>
             </div>
-            <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-[#1565D8] shrink-0" />
-              <a href={`mailto:${settings.contactEmail}`} className="hover:text-[#1565D8]">
-                {settings.contactEmail}
-              </a>
+
+            <div>
+              <span className="text-xs font-bold text-[#5B6472] uppercase block">
+                {locale === "bn" ? "প্রকল্প কোড:" : "Project Code:"}
+              </span>
+              <span className="font-mono font-bold text-[#0B2A5B] block mt-0.5">
+                {siteConfig.projectCode}
+              </span>
             </div>
           </div>
 
-          {/* Map Preview placeholder box */}
-          <div className="rounded-lg overflow-hidden border border-[#E2DED5] bg-slate-100 p-6 text-center text-xs text-slate-500">
-            <MapPin className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-            <span className="font-semibold block text-slate-700">Saidpur Cantonment, Saidpur, Nilphamari</span>
-            <span>GPS: 25.7785° N, 88.8974° E</span>
+          {/* Location notes */}
+          <div className="p-3.5 bg-[#FAF9F6] border border-[#E5E2DA] rounded text-xs text-[#5B6472] leading-relaxed">
+            <strong className="text-[#0B2A5B] block mb-1">
+              {locale === "bn" ? "অবস্থান নির্দেশনা:" : "Location Notice:"}
+            </strong>
+            {locale === "bn"
+              ? "সৈয়দপুর সেনানিবাসের ভেতরে অবস্থিত বাউস্ট একাডেমিক ক্যাম্পাস। প্রবেশের সময় ভিজিটর পাস এবং জাতীয় পরিচয়পত্র সাথে রাখুন।"
+              : "Inside Saidpur Cantonment. Please bring valid national ID card at entrance."}
           </div>
         </div>
 
         {/* Contact Form */}
-        <div className="lg:col-span-7 efa-card p-6 sm:p-8 bg-white space-y-6">
-          <h2 className="text-xl font-bold text-[#0B2A5B]">
+        <div className="lg:col-span-7 border border-[#E5E2DA] rounded-lg p-6 sm:p-8 bg-white space-y-5">
+          <h2 className="text-lg font-bold text-[#0B2A5B] border-b border-[#E5E2DA] pb-3">
             {locale === "bn" ? "বার্তা পাঠান" : "Send a Message"}
           </h2>
 
           {submitted ? (
-            <div className="p-6 bg-emerald-50 rounded-lg text-emerald-800 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-[#1E8E4F] mx-auto" />
-              <h3 className="font-bold text-lg">{locale === "bn" ? "বার্তা সফলভাবে পাঠানো হয়েছে!" : "Message Sent Successfully!"}</h3>
-              <p className="text-sm">{locale === "bn" ? "আমাদের প্রতিনিধি দ্রুততম সময়ে উত্তর প্রদান করবেন।" : "We will reply to your message as soon as possible."}</p>
+            <div className="p-4 bg-[#FAF9F6] border border-[#1E8E4F] rounded text-sm text-[#0B2A5B] space-y-1">
+              <h3 className="font-bold">{locale === "bn" ? "ধন্যবাদ! আপনার বার্তা পৌঁছেছে।" : "Thank you! Message received."}</h3>
+              <p className="text-xs text-[#5B6472]">{locale === "bn" ? "আমাদের সমন্বয়কারী দ্রুত যোগাযোগ করবেন।" : "We will follow up shortly."}</p>
             </div>
           ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSubmitted(true);
-              }}
-              className="space-y-4"
-            >
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-slate-700 mb-1">{locale === "bn" ? "নাম *" : "Name *"}</label>
-                  <input required type="text" className="w-full px-3 py-2 border border-[#E2DED5] rounded text-sm" />
+                  <label className="block text-xs font-bold text-[#1F2937] mb-1">
+                    {locale === "bn" ? "আপনার পূর্ণ নাম *" : "Full Name *"}
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-[#E5E2DA] rounded text-sm"
+                  />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase text-slate-700 mb-1">{locale === "bn" ? "মোবাইল *" : "Phone *"}</label>
-                  <input required type="tel" className="w-full px-3 py-2 border border-[#E2DED5] rounded text-sm" />
+                  <label className="block text-xs font-bold text-[#1F2937] mb-1">
+                    {locale === "bn" ? "মোবাইল নম্বর *" : "Phone Number *"}
+                  </label>
+                  <input
+                    required
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-[#E5E2DA] rounded text-sm"
+                  />
                 </div>
               </div>
+
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">{locale === "bn" ? "বিষয় *" : "Subject *"}</label>
-                <input required type="text" className="w-full px-3 py-2 border border-[#E2DED5] rounded text-sm" />
+                <label className="block text-xs font-bold text-[#1F2937] mb-1">
+                  {locale === "bn" ? "ইমেইল এড্রেস" : "Email Address"}
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-[#E5E2DA] rounded text-sm"
+                />
               </div>
+
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">{locale === "bn" ? "আপনার বার্তা *" : "Message *"}</label>
-                <textarea required rows={4} className="w-full px-3 py-2 border border-[#E2DED5] rounded text-sm" />
+                <label className="block text-xs font-bold text-[#1F2937] mb-1">
+                  {locale === "bn" ? "বিষয় *" : "Subject *"}
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder={locale === "bn" ? "যেমন: সেন্টারে লার্নিং ভিজিট বা অনুদান" : "e.g. Centre visit or collaboration"}
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full px-3 py-2 border border-[#E5E2DA] rounded text-sm"
+                />
               </div>
-              <button type="submit" className="btn-navy text-sm font-semibold flex items-center gap-2">
-                <Send className="w-4 h-4" />
-                <span>{locale === "bn" ? "বার্তা পাঠান" : "Submit Message"}</span>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] mb-1">
+                  {locale === "bn" ? "আপনার বার্তা *" : "Message *"}
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full px-3 py-2 border border-[#E5E2DA] rounded text-sm"
+                />
+              </div>
+
+              <button type="submit" className="btn-navy text-sm py-2 px-6">
+                {locale === "bn" ? "বার্তা পাঠান" : "Send Message"}
               </button>
             </form>
           )}

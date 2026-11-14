@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { Image as ImageIcon, X } from "lucide-react";
 
 export default function GalleryPage() {
   const { locale } = useLanguage();
@@ -42,65 +41,58 @@ export default function GalleryPage() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
-      <div className="max-w-3xl space-y-4">
-        <div className="inline-block bg-[#1565D8]/10 text-[#1565D8] px-3 py-1 rounded text-sm font-semibold">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
+      <div className="max-w-3xl space-y-3">
+        <span className="text-xs font-semibold text-[#1E8E4F] uppercase tracking-wider block">
           {locale === "bn" ? "ছবির অ্যালবাম" : "Photo Gallery"}
-        </div>
+        </span>
         <h1 className="text-3xl sm:text-4xl font-bold text-[#0B2A5B] tracking-tight">
           {locale === "bn"
             ? "কমিউনিটি সেন্টারের জীবন্ত মুহূর্তসমূহ"
             : "Vibrant Moments from the Learning Centres"}
         </h1>
-        <p className="text-base sm:text-lg text-slate-600">
+        <p className="text-base text-[#5B6472]">
           {locale === "bn"
             ? "সুবিধাবঞ্চিত শিশুদের চোখে আশার ঝিলিক এবং মাঠপর্যায়ে আমাদের কার্যক্রমের বাস্তব চিত্র।"
             : "Real photographs reflecting the dignity, joy, and curiosity of children in rural Bangladesh."}
         </p>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {photos.map((item, idx) => (
           <div
             key={idx}
             onClick={() => setSelectedImage(item.url)}
-            className="efa-card overflow-hidden cursor-pointer group bg-white hover:shadow-lg transition-all"
+            className="border border-[#E5E2DA] rounded-lg overflow-hidden bg-white cursor-pointer"
           >
-            <div className="relative h-64 overflow-hidden">
-              <img
-                src={item.url}
-                alt={item.captionEn}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                <ImageIcon className="w-8 h-8" />
-              </div>
-            </div>
-            <div className="p-4 text-sm font-medium text-slate-800">
+            <img
+              src={item.url}
+              alt={item.captionEn}
+              className="w-full h-56 object-cover"
+            />
+            <div className="p-3 text-sm text-[#1F2937]">
               {locale === "bn" ? item.captionBn : item.captionEn}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Lightbox Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setSelectedImage(null)}
-              className="absolute -top-10 right-0 text-white hover:text-slate-300"
+              className="absolute -top-9 right-0 text-white text-sm font-bold"
             >
-              <X className="w-8 h-8" />
+              [বন্ধ করুন ✕]
             </button>
             <img
               src={selectedImage}
               alt="Full view"
-              className="w-full max-h-[85vh] object-contain rounded-lg"
+              className="w-full max-h-[85vh] object-contain rounded"
             />
           </div>
         </div>
