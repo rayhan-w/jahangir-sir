@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --navy: #0B2A5B;
+  --blue: #1565D8;
+  --gold: #E9A319;
+  --green: #1E8E4F;
+  --ink: #1A202C;
+  --grey: #606C80;
+  --paper: #F7F5F0;
+  --border: #E2DED5;
+  --white: #FFFFFF;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-navy: var(--navy);
+  --color-blue: var(--blue);
+  --color-gold: var(--gold);
+  --color-green: var(--green);
+  --color-ink: var(--ink);
+  --color-grey: var(--grey);
+  --color-paper: var(--paper);
+  --color-border: var(--border);
+  --font-bengali: var(--font-hind-siliguri), sans-serif;
+  --font-english: var(--font-inter), sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-hind-siliguri), var(--font-inter), sans-serif;
+  line-height: 1.6;
+}
+
+/* Print-like Editorial Warm Card */
+.efa-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+/* Primary Button Solid Navy */
+.btn-navy {
+  background-color: var(--navy);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s ease-in-out;
+}
+.btn-navy:hover {
+  opacity: 0.92;
+}
+
+/* Accent Button Sun Gold */
+.btn-gold {
+  background-color: var(--gold);
+  color: #0B2A5B;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s ease-in-out;
+}
+.btn-gold:hover {
+  opacity: 0.92;
+}
+
+/* Learning Blue Button */
+.btn-blue {
+  background-color: var(--blue);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s ease-in-out;
+}
+.btn-blue:hover {
+  opacity: 0.92;
+}
+
+/* Large Tap Target for Student App (≥56px) */
+.student-tap-target {
+  min-height: 56px;
+  min-width: 56px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

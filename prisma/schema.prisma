@@ -1,0 +1,552 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  PROGRAMME_MANAGER
+  CENTRE_TEACHER
+  CONTENT_EDITOR
+}
+
+enum LessonType {
+  VIDEO
+  AUDIO
+  READING
+  QUIZ_ONLY
+}
+
+enum QuestionType {
+  MCQ
+  TRUE_FALSE
+  FILL_BLANK
+  MATCH_PAIRS
+  ORDERING
+  AUDIO_QUESTION
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+}
+
+enum HelpRequestStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum FormType {
+  VOLUNTEER
+  SUPPORT
+  CONTACT
+}
+
+enum FormStatus {
+  NEW
+  CONTACTED
+  JOINED
+  ARCHIVED
+}
+
+enum SmsStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  phone        String
+  passwordHash String
+  role         Role          @default(CENTRE_TEACHER)
+  centreId     String?
+  centre       Centre?       @relation("CentreTeachers", fields: [centreId], references: [id])
+  inChargeAt   Centre[]      @relation("CentreInCharge")
+  lastLoginAt  DateTime?
+  attendances  Attendance[]  @relation("MarkedAttendances")
+  replies      HelpRequest[] @relation("UserHelpReplies")
+  cmsSections  CmsSection[]  @relation("UserCmsEdits")
+  auditLogs    AuditLog[]    @relation("UserAuditLogs")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  @@index([role])
+  @@index([centreId])
+}
+
+model Centre {
+  id          String       @id @default(cuid())
+  code        String       @unique
+  name        String
+  district    String
+  address     String
+  lat         Float
+  lng         Float
+  inChargeId  String?
+  inCharge    User?        @relation("CentreInCharge", fields: [inChargeId], references: [id])
+  teachers    User[]       @relation("CentreTeachers")
+  students    Student[]
+  attendances Attendance[]
+  tabletCount Int          @default(10)
+  photoUrl    String?
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  @@index([district])
+  @@index([active])
+}
+
+model Class {
+  id        String    @id @default(cuid())
+  level     Int       @unique
+  nameBn    String
+  nameEn    String
+  subjects  Subject[]
+  students  Student[]
+}
+
+model Subject {
+  id       String    @id @default(cuid())
+  classId  String
+  class    Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+  nameBn   String
+  nameEn   String
+  colour   String    @default("#1565D8")
+  icon     String    @default("book-open")
+  order    Int       @default(0)
+  chapters Chapter[]
+
+  @@index([classId])
+  @@index([order])
+}
+
+model Chapter {
+  id             String     @id @default(cuid())
+  subjectId      String
+  subject        Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  titleBn        String
+  titleEn        String
+  order          Int        @default(0)
+  prerequisiteId String?
+  prerequisite   Chapter?   @relation("ChapterPrerequisites", fields: [prerequisiteId], references: [id])
+  dependents     Chapter[]  @relation("ChapterPrerequisites")
+  lessons        Lesson[]
+  questions      Question[]
+  quizzes        Quiz[]
+  masteries      Mastery[]
+
+  @@index([subjectId])
+  @@index([order])
+}
+
+model Lesson {
+  id           String         @id @default(cuid())
+  chapterId    String
+  chapter      Chapter        @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  titleBn      String
+  titleEn      String
+  type         LessonType     @default(VIDEO)
+  videoHlsUrl  String?
+  audioUrl     String?
+  pdfUrl       String?
+  durationSec  Int            @default(0)
+  downloadable Boolean        @default(true)
+  published    Boolean        @default(false)
+  order        Int            @default(0)
+  progress     Progress[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+
+  @@index([chapterId])
+  @@index([order])
+  @@index([published])
+}
+
+model Question {
+  id            String         @id @default(cuid())
+  chapterId     String
+  chapter       Chapter        @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  type          QuestionType   @default(MCQ)
+  difficulty    Int            @default(1)
+  textBn        String
+  textEn        String
+  options       Json           // [{id: "1", textBn: "...", textEn: "..."}]
+  answer        Json           // correct option id(s) or text
+  explanationBn String?
+  explanationEn String?
+  audioUrl      String?
+  quizQuestions QuizQuestion[]
+  createdAt     DateTime       @default(now())
+
+  @@index([chapterId])
+  @@index([difficulty])
+  @@index([type])
+}
+
+model Quiz {
+  id                String         @id @default(cuid())
+  chapterId         String
+  chapter           Chapter        @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  title             String
+  thresholdOverride Int?
+  maxAttempts       Int            @default(3)
+  questions         QuizQuestion[]
+  attempts          Attempt[]
+  createdAt         DateTime       @default(now())
+
+  @@index([chapterId])
+}
+
+model QuizQuestion {
+  id         String   @id @default(cuid())
+  quizId     String
+  quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  order      Int      @default(0)
+
+  @@unique([quizId, questionId])
+  @@index([quizId])
+}
+
+model Student {
+  id            String         @id @default(cuid())
+  studentId     String         @unique
+  centreId      String
+  centre        Centre         @relation(fields: [centreId], references: [id])
+  classId       String
+  class         Class          @relation(fields: [classId], references: [id])
+  name          String
+  photoUrl      String?
+  pinHash       String
+  guardianName  String
+  guardianPhone String
+  supportNeeds  String?
+  dob           DateTime?
+  active        Boolean        @default(true)
+  attempts      Attempt[]
+  progress      Progress[]
+  masteries     Mastery[]
+  pointLedgers  PointLedger[]
+  badges        StudentBadge[]
+  attendances   Attendance[]
+  helpRequests  HelpRequest[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+
+  @@index([centreId])
+  @@index([classId])
+  @@index([guardianPhone])
+}
+
+model Attempt {
+  id          String   @id @default(cuid())
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id])
+  score       Float
+  answers     Json
+  clientUuid  String   @unique
+  deviceId    String
+  startedAt   DateTime
+  submittedAt DateTime
+  syncedAt    DateTime @default(now())
+
+  @@index([quizId])
+  @@index([studentId])
+  @@index([clientUuid])
+}
+
+model Progress {
+  id             String         @id @default(cuid())
+  studentId      String
+  student        Student        @relation(fields: [studentId], references: [id])
+  lessonId       String
+  lesson         Lesson         @relation(fields: [lessonId], references: [id])
+  status         ProgressStatus @default(NOT_STARTED)
+  lastPositionSec Int           @default(0)
+  understood     Boolean?
+  completedAt    DateTime?
+  clientUuid     String         @unique
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([studentId])
+  @@index([lessonId])
+  @@index([clientUuid])
+}
+
+model Mastery {
+  id         String    @id @default(cuid())
+  studentId  String
+  student    Student   @relation(fields: [studentId], references: [id])
+  chapterId  String
+  chapter    Chapter   @relation(fields: [chapterId], references: [id])
+  percent    Float     @default(0)
+  masteredAt DateTime?
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([studentId, chapterId])
+  @@index([studentId])
+  @@index([chapterId])
+}
+
+model PointLedger {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  points    Int
+  reason    String
+  refId     String?
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model Badge {
+  id            String         @id @default(cuid())
+  code          String         @unique
+  titleBn       String
+  titleEn       String
+  descriptionBn String
+  descriptionEn String
+  icon          String
+  requiredPoints Int?
+  students      StudentBadge[]
+}
+
+model StudentBadge {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  earnedAt  DateTime @default(now())
+
+  @@unique([studentId, badgeId])
+  @@index([studentId])
+}
+
+model Attendance {
+  id         String           @id @default(cuid())
+  centreId   String
+  centre     Centre           @relation(fields: [centreId], references: [id])
+  studentId  String
+  student    Student          @relation(fields: [studentId], references: [id])
+  date       DateTime
+  status     AttendanceStatus @default(PRESENT)
+  markedById String
+  markedBy   User             @relation("MarkedAttendances", fields: [markedById], references: [id])
+  createdAt  DateTime         @default(now())
+
+  @@unique([centreId, studentId, date])
+  @@index([centreId])
+  @@index([studentId])
+  @@index([date])
+}
+
+model HelpRequest {
+  id          String            @id @default(cuid())
+  studentId   String
+  student     Student           @relation(fields: [studentId], references: [id])
+  message     String
+  audioUrl    String?
+  status      HelpRequestStatus @default(OPEN)
+  reply       String?
+  repliedById String?
+  repliedBy   User?             @relation("UserHelpReplies", fields: [repliedById], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([studentId])
+  @@index([status])
+}
+
+model SyncLog {
+  id          String   @id @default(cuid())
+  deviceId    String
+  studentId   String?
+  pushedCount Int
+  errors      Json?
+  at          DateTime @default(now())
+
+  @@index([deviceId])
+  @@index([studentId])
+}
+
+model CmsPage {
+  id        String       @id @default(cuid())
+  slug      String       @unique
+  titleBn   String
+  titleEn   String
+  seoTitleBn String?
+  seoTitleEn String?
+  seoDescBn String?
+  seoDescEn String?
+  sections  CmsSection[]
+}
+
+model CmsSection {
+  id         String   @id @default(cuid())
+  pageId     String
+  page       CmsPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  sectionKey String
+  contentBn  Json
+  contentEn  Json
+  updatedById String?
+  updatedBy  User?    @relation("UserCmsEdits", fields: [updatedById], references: [id])
+  updatedAt  DateTime @updatedAt
+
+  @@unique([pageId, sectionKey])
+  @@index([pageId])
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  url       String
+  type      String   // IMAGE, VIDEO, AUDIO, DOCUMENT
+  alt       String?
+  album     String?
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([album])
+}
+
+model Story {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  titleBn      String
+  titleEn      String
+  summaryBn    String
+  summaryEn    String
+  contentBn    String
+  contentEn    String
+  photoUrl     String
+  consentGiven Boolean  @default(true)
+  featured     Boolean  @default(false)
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@index([featured])
+  @@index([published])
+}
+
+model Faq {
+  id         String @id @default(cuid())
+  questionBn String
+  questionEn String
+  answerBn   String
+  answerEn   String
+  category   String @default("general")
+  order      Int    @default(0)
+
+  @@index([category])
+  @@index([order])
+}
+
+model Partner {
+  id            String  @id @default(cuid())
+  nameBn        String
+  nameEn        String
+  logoUrl       String
+  descriptionBn String
+  descriptionEn String
+  websiteUrl    String?
+  order         Int     @default(0)
+
+  @@index([order])
+}
+
+model GalleryAlbum {
+  id       String         @id @default(cuid())
+  titleBn  String
+  titleEn  String
+  coverUrl String
+  order    Int            @default(0)
+  photos   GalleryPhoto[]
+
+  @@index([order])
+}
+
+model GalleryPhoto {
+  id        String       @id @default(cuid())
+  albumId   String
+  album     GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  photoUrl  String
+  captionBn String
+  captionEn String
+  order     Int          @default(0)
+
+  @@index([albumId])
+  @@index([order])
+}
+
+model FormSubmission {
+  id        String     @id @default(cuid())
+  type      FormType
+  payload   Json
+  status    FormStatus @default(NEW)
+  notes     String?
+  createdAt DateTime   @default(now())
+
+  @@index([type])
+  @@index([status])
+}
+
+model SmsLog {
+  id             String    @id @default(cuid())
+  recipientPhone String
+  message        String
+  status         SmsStatus @default(PENDING)
+  provider       String
+  gatewayId      String?
+  sentAt         DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([recipientPhone])
+  @@index([status])
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id       String   @id @default(cuid())
+  userId   String?
+  user     User?    @relation("UserAuditLogs", fields: [userId], references: [id])
+  action   String
+  entity   String
+  entityId String?
+  meta     Json?
+  at       DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+}
